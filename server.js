@@ -72,25 +72,6 @@ app.put("/users/:userId/lessons/:language/progress", (req, res) => {
     res.send("user progress updated");
 });
 
-//Collection
-
-//get all words user has learned
-app.get("/collection", (req, res) => {
-    res.send("All words");
-});
-
-//search words user has learned
-app.get("/collection/search", (req, res) => {
-    //add req.query
-    res.send("search words");
-});
-
-//Filter words by learned/unlearned status
-app.get("/collection/filter", (req, res) => {
-    //add req.query
-    res.send("filter words");
-});
-
 //Admin page
 
 //get all users
