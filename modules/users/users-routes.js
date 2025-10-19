@@ -9,6 +9,7 @@ const { validationResult } = require("express-validator");
 const {
     getAllUsers,
     getUserByEmail,
+    getUserById,
     addUser,
     updateUser,
     deleteUser

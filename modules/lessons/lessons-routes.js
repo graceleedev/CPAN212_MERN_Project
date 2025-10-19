@@ -1,27 +1,67 @@
+const express = require("express");
+const lessonsRoute = express.Router();
 
-//Lessons
+const { validationResult } = require("express-validator");
+const { filterLessonRules } = require("./middlewares/filter-lesson-rules");
 
-//get simple question lesson by leesonId
-app.get("/lessons/:lessonId/questions", (req, res) => {
-    res.send("simple questions by lessonId");
+const {
+    getAllLessons,
+    getLessonById,
+    searchLesson,
+    filterLesson
+ } = require("./lessons-model");
+
+//lesson main page
+
+lessonsRoute.get("/:id", async (req, res) => {
+    try {
+        const getId = get.params.id;
+        const lesson = await getLessonById(getId);
+        if(!lesson) {
+            res.status(404).send("lesson not found");
+        } else {
+            res.status(200).json(lesson);
+        }
+    } catch (error) {
+        res.status(500).send("Internal server error")
+    }
+})
+
+//search lessons
+//GET /lessons/search?keyword=hello
+
+lessonsRoute.get("/search", async (req, res) => {
+    try {
+        const getKeyword = req.query.keyword;
+        const results = await searchLesson(getKeyword);
+        if(!results) {
+            res.status(200).json([]);
+        } else {
+            res.json(results);
+        }        
+    } catch (error) {
+        res.status(500).send("Internal server error")
+    }
 });
 
-//post simple question answer
-app.post("/lessons/:lessonId/questions/:questionId/answer", (req, res) => {
-    res.send("simple question answer submitted");
-});
+//filter lessons by level
+//GET /lessons/filter?level=beginner
 
-//get scenario-based game lesson by leesonId
-app.get("/lessons/:lessonId/scenario", (req, res) => {
-    res.send("scenario by lessonId");
-});
-
-//post scenario-based game answer
-app.post("/lessons/:lessonId/scenario/:scenarioId/answer", (req, res) => {
-    res.send("scenario-based game answer submitted");
-});
-
-//update user progress after lessons finished
-app.put("/users/:userId/lessons/:language/progress", (req, res) => {
-    res.send("user progress updated");
+lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if(!errors.isEmpty) {
+            res.status(404).send("Invalid level value")
+        } 
+        const getLevel = req.query.level;
+        const results = await filterLesson(getLevel);
+        if(!results) {
+            res.status(200).json([]);
+        } else {
+            res.json(results);
+        }
+        
+    } catch (error) {
+        res.status(500).send("Internal server error")
+    }
 });
