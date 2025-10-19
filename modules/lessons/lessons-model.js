@@ -8,7 +8,7 @@ async function getAllLessons() {
 
 //find lesson by id
 async function getLessonById(lessonId) {
-    if (!lessonId) throw new Error(`Cannot use ${lessonId} to get users`);
+    if (!lessonId) throw new Error(`Cannot use ${lessonId} to get lessons`);
     const allLessons = await getAllLessons();
     const foundLesson = allLessons.find((lesson) => lesson.id === lessonId);
     return foundLesson;

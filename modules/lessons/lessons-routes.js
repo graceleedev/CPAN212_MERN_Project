@@ -11,6 +11,8 @@ const {
     filterLesson
  } = require("./lessons-model");
 
+const { getQuestionsByLessonId } = require("../questions/questions-model");
+
 //lesson main page
 
 lessonsRoute.get("/:id", async (req, res) => {
@@ -64,4 +66,20 @@ lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
     } catch (error) {
         res.status(500).send("Internal server error")
     }
+});
+
+//get questions by lesson id
+
+lessonsRoute.get("/:id/questions", async (req, res) => {
+  try {
+    const getId = req.params.id;
+    const questions = await getQuestionsByLessonId(getId);
+    if (!questions) {
+        res.status(404).send("No questions found");
+    } else {
+        res.status(200).json(questions);
+    }
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  }
 });
