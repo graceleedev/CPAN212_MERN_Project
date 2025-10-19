@@ -16,9 +16,7 @@ async function getProgressByUserId(userId) {
   return foundProgress;
 }
 
-//Save progress
-//Create progress if there's no progress for userId
-//Update progress if there's existing progress for userId
+//add progress for new users
 async function addProgress(newProgress) {
   const allProgress = await getAllProgress();
   const index = allProgress.findIndex(
