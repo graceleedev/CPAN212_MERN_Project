@@ -29,7 +29,7 @@ async function filterLesson(level) {
     const allLessons = await getAllLessons();
     if (!level) return allLessons;
 
-    const lowerKeyword = keyword.toLowerCase();
+    const lowerKeyword = level.toLowerCase();
     const results = allLessons.filter((lesson) => lesson.level === level);
     return results;
 }

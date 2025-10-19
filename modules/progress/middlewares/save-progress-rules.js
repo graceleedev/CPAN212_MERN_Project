@@ -10,7 +10,7 @@ const saveProgressRules = [
   body("updatedAt")
     .optional()
     .isISO8601()
-    .withMessage("Invalid date format (use ISO 8601)")
+    .withMessage("Invalid date format")
 ];
 
 module.exports = { saveProgressRules };

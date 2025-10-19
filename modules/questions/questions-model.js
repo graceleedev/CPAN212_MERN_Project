@@ -31,7 +31,7 @@ async function checkAnswer(questionId, answer) {
 async function getQuestionsByLessonId(lessonId) {
   if (!lessonId) throw new Error(`Cannot use ${lessonId} to get questions`);
   const allQuestions = await getAllQuestions();
-  const foundQuestion = allQuestions.find(
+  const foundQuestion = allQuestions.filter(
     (question) => question.lessonId === lessonId
   );
   return foundQuestion;

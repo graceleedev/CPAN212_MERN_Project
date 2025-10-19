@@ -15,7 +15,7 @@ const passwordRule = body("password")
   .optional()
   .isString()
   .isLength({ min: 6 })
-  .withMessage("Name must be at least 6 characters");
+  .withMessage("Password must be at least 6 characters");
 
 const updateUserRules = [
     userNameRule,

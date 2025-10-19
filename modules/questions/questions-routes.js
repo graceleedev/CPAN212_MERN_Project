@@ -6,7 +6,7 @@ const { getQuestionById, checkAnswer } = require("./questions-model");
 //get questions by questionId
 questionsRoute.get("/:id", async (req, res) => {
   try {
-    const getId = req.params.id;
+    const getId = Number(req.params.id);
     const question = await getQuestionById(getId);
     if (question) {
         res.status(200).json(question);
@@ -22,7 +22,7 @@ questionsRoute.get("/:id", async (req, res) => {
 //id, answer
 questionsRoute.post("/:id/answer", async (req, res) => {
   try {
-    const getId = req.params.id;
+    const getId = Number(req.params.id);
     const getAnswer = req.body.answer;
     const question = await getQuestionById(getId);
 

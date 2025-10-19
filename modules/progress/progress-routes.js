@@ -14,7 +14,7 @@ const {
 //get progress by userId
 progressRoute.get("/:id", async (req, res) => {
   try {
-    const getId = req.params.id;
+    const getId = Number(req.params.id);
     const progress = await getProgressByUserId(getId);
     if (progress) {
       res.status(200).json(progress);
@@ -32,14 +32,9 @@ progressRoute.post("/", saveProgressRules, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
-    }
-    const getId = req.body.id;
-    const progress = await getProgressByUserId(getId);
-    if (progress) {
+    } else {
       const addedProgress = await addProgress(req.body);
       res.status(201).json(addedProgress);
-    } else {
-      res.status(404).send("progress not found");
     }
   } catch (error) {
     res.status(500).send("internal server error");

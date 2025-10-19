@@ -54,7 +54,7 @@ usersRoute.post("/login", loginUserRules, async (req, res) => {
 //User setting page
 usersRoute.put("/setting/update/:id", updateUserRules, async (req, res) => {
   try {
-    const getId = req.params.id;
+    const getId = Number(req.params.id);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -65,13 +65,14 @@ usersRoute.put("/setting/update/:id", updateUserRules, async (req, res) => {
     }
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).send("Internal server error");
+    
+    res.status(500).send("internal server error");
   }
 });
 
 usersRoute.delete("/setting/delete/:id", async (req, res) => {
   try {
-    const getId = parseInt(req.params.id);
+    const getId = Number(req.params.id);
     const user = await getUserById(getId);
     if (user) {
       const deletedUser = await deleteUser(getId);

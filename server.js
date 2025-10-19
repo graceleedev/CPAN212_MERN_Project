@@ -11,7 +11,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //import Routes from each modules
-
 app.use("/users", usersRoute);
 app.use("/lessons", lessonsRoute);
 app.use("/questions", questionsRoute);

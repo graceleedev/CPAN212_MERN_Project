@@ -22,7 +22,7 @@ async function getProgressByUserId(userId) {
 async function addProgress(newProgress) {
   const allProgress = await getAllProgress();
   const index = allProgress.findIndex(
-    (progress) => progress.userId === newProgress.userId
+    (progress) => Number(progress.userId) === Number(newProgress.userId)
   );
   if (index < 0) {
     allProgress.push({ ...newProgress, updatedAt: new Date().toISOString() });

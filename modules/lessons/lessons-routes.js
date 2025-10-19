@@ -55,7 +55,7 @@ lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
 
 lessonsRoute.get("/:id/questions", async (req, res) => {
     try {
-        const getId = req.params.id;
+        const getId = Number(req.params.id);
         const questions = await getQuestionsByLessonId(getId);
         if (questions) {
             res.status(200).json(questions);
@@ -70,7 +70,7 @@ lessonsRoute.get("/:id/questions", async (req, res) => {
 //lesson main page
 lessonsRoute.get("/:id", async (req, res) => {
     try {
-        const getId = req.params.id;
+        const getId = Number(req.params.id);
         const lesson = await getLessonById(getId);
         if(lesson) {
             res.status(200).json(lesson);
