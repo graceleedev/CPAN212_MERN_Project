@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "questionId": 1,
+    "lessonId": 1,
+    "type": "simple",
+    "options": [
+      { "key": "A", "text": "Arigato" },
+      { "key": "B", "text": "Ohayo" }
+    ],
+    "correctAnswer": "B"
+  }
+]

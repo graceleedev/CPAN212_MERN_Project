@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Ardisj Bradden",
+    "email": "abradden0@cornell.edu",
+    "password": "1234",
+    "isAdmin": true,
+    "progress": "Progress.lessonId",
+    "createdAt": "2025-10-17T14:00:00Z",
+    "updatedAt": "2025-10-18T14:00:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Husain Swetmore",
+    "email": "hswetmore1@t-online.de",
+    "password": "4567",
+    "isAdmin": false,
+    "progress": "Progress.lessonId",
+    "createdAt": "2025-10-17T14:00:00Z",
+    "updatedAt": "2025-10-18T14:00:00Z"
+  },
+  {
+    "id": 3,
+    "name": "Merv Huddle",
+    "email": "mhuddle2@wikispaces.com",
+    "password": "1234",
+    "isAdmin": false,
+    "progress": "Progress.lessonId",
+    "createdAt": "2025-10-17T14:00:00Z",
+    "updatedAt": "2025-10-18T14:00:00Z"
+  }
+]
