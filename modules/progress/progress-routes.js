@@ -16,10 +16,10 @@ progressRoute.get("/:id", async (req, res) => {
   try {
     const getId = req.params.id;
     const progress = await getProgressByUserId(getId);
-    if (!progress) {
-      res.status(404).send("progress not found");
-    } else {
+    if (progress) {
       res.status(200).json(progress);
+    } else {
+      res.status(404).send("progress not found");
     }
   } catch (error) {
     res.status(500).send("internal server error");
@@ -35,11 +35,11 @@ progressRoute.post("/", saveProgressRules, async (req, res) => {
     }
     const getId = req.body.id;
     const progress = await getProgressByUserId(getId);
-    if (!progress) {
-      res.status(404).send("progress not found");
-    } else {
+    if (progress) {
       const addedProgress = await addProgress(req.body);
       res.status(201).json(addedProgress);
+    } else {
+      res.status(404).send("progress not found");
     }
   } catch (error) {
     res.status(500).send("internal server error");
@@ -55,13 +55,15 @@ progressRoute.put("/", saveProgressRules, async (req, res) => {
     }
     const getId = req.body.id;
     const progress = await getProgressByUserId(getId);
-    if (!progress) {
-      res.status(404).send("progress not found");
-    } else {
+    if (progress) {
       const updatedProgress = await updateProgress(req.body);
       res.status(201).json(updatedProgress);
+    } else {
+      res.status(404).send("progress not found");
     }
   } catch (error) {
     res.status(500).send("internal server error");
   }
 });
+
+module.exports = { progressRoute };

@@ -13,33 +13,17 @@ const {
 
 const { getQuestionsByLessonId } = require("../questions/questions-model");
 
-//lesson main page
-
-lessonsRoute.get("/:id", async (req, res) => {
-    try {
-        const getId = get.params.id;
-        const lesson = await getLessonById(getId);
-        if(!lesson) {
-            res.status(404).send("lesson not found");
-        } else {
-            res.status(200).json(lesson);
-        }
-    } catch (error) {
-        res.status(500).send("Internal server error")
-    }
-})
 
 //search lessons
 //GET /lessons/search?keyword=hello
-
 lessonsRoute.get("/search", async (req, res) => {
     try {
         const getKeyword = req.query.keyword;
         const results = await searchLesson(getKeyword);
-        if(!results) {
-            res.status(200).json([]);
-        } else {
+        if(results) {
             res.json(results);
+        } else {
+            res.status(200).json([]);
         }        
     } catch (error) {
         res.status(500).send("Internal server error")
@@ -48,19 +32,18 @@ lessonsRoute.get("/search", async (req, res) => {
 
 //filter lessons by level
 //GET /lessons/filter?level=beginner
-
 lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
     try {
         const errors = validationResult(req);
-        if(!errors.isEmpty) {
-            res.status(404).send("Invalid level value")
+        if(!errors.isEmpty()) {
+            res.status(400).send("Invalid level value")
         } 
         const getLevel = req.query.level;
         const results = await filterLesson(getLevel);
-        if(!results) {
-            res.status(200).json([]);
-        } else {
+        if(results) {
             res.json(results);
+        } else {
+            res.status(200).json([]);
         }
         
     } catch (error) {
@@ -71,15 +54,32 @@ lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
 //get questions by lesson id
 
 lessonsRoute.get("/:id/questions", async (req, res) => {
-  try {
-    const getId = req.params.id;
-    const questions = await getQuestionsByLessonId(getId);
-    if (!questions) {
-        res.status(404).send("No questions found");
-    } else {
-        res.status(200).json(questions);
+    try {
+        const getId = req.params.id;
+        const questions = await getQuestionsByLessonId(getId);
+        if (questions) {
+            res.status(200).json(questions);
+        } else {
+            res.status(404).send("No questions found");
+        }
+    } catch (error) {
+        res.status(500).send("Internal server error");
     }
-  } catch (error) {
-    res.status(500).send("Internal server error");
-  }
 });
+
+//lesson main page
+lessonsRoute.get("/:id", async (req, res) => {
+    try {
+        const getId = req.params.id;
+        const lesson = await getLessonById(getId);
+        if(lesson) {
+            res.status(200).json(lesson);
+        } else {
+            res.status(404).send("lesson not found");
+        }
+    } catch (error) {
+        res.status(500).send("Internal server error")
+    }
+})
+
+module.exports = { lessonsRoute };

@@ -3,9 +3,9 @@ const port = 3000;
 const app = express();
 
 const { usersRoute } = require("./modules/users/users-routes");
-const { lessonsRoute } = require("./modules/users/lessons-routes");
-const { questionsRoute } = require("./modules/users/questions-routes");
-const { progressRoute } = require("./modules/users/progress-routes");
+const { lessonsRoute } = require("./modules/lessons/lessons-routes");
+const { questionsRoute } = require("./modules/questions/questions-routes");
+const { progressRoute } = require("./modules/progress/progress-routes");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,8 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/users", usersRoute);
 app.use("/lessons", lessonsRoute);
 app.use("/questions", questionsRoute);
-app.use("/products", progressRoute);
+app.use("/progress", progressRoute);
 
+//main page
 app.get("/", (req, res) => {
     res.send("Welcome to Ringo🍎");
 })

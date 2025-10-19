@@ -19,7 +19,7 @@ async function getQuestionById(quesionId) {
 //Check answer
 async function checkAnswer(questionId, answer) {
   const question = await getQuestionById(questionId);
-  if (!question) throw new Error("Question not found");
+  if (!questionId) throw new Error("Question not found");
 
   const isCorrect = question.correctAnswer === answer;
   const feedback = isCorrect ? "Correct!" : "Try again";
