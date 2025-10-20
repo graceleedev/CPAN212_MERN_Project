@@ -26,7 +26,7 @@ lessonsRoute.get("/search", async (req, res) => {
             res.status(200).json([]);
         }        
     } catch (error) {
-        res.status(500).send("Internal server error")
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 
@@ -36,7 +36,7 @@ lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
     try {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            res.status(400).send("Invalid level value")
+            res.status(400).json({ error: "Invalid level value" })
         } 
         const getLevel = req.query.level;
         const results = await filterLesson(getLevel);
@@ -45,9 +45,8 @@ lessonsRoute.get("/filter", filterLessonRules, async (req, res) => {
         } else {
             res.status(200).json([]);
         }
-        
     } catch (error) {
-        res.status(500).send("Internal server error")
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 
@@ -60,10 +59,10 @@ lessonsRoute.get("/:id/questions", async (req, res) => {
         if (questions) {
             res.status(200).json(questions);
         } else {
-            res.status(404).send("No questions found");
+            res.status(404).json({ error: "No questions found" });
         }
     } catch (error) {
-        res.status(500).send("Internal server error");
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 
@@ -75,10 +74,10 @@ lessonsRoute.get("/:id", async (req, res) => {
         if(lesson) {
             res.status(200).json(lesson);
         } else {
-            res.status(404).send("lesson not found");
+            res.status(404).json({ error: "lesson not found" });
         }
     } catch (error) {
-        res.status(500).send("Internal server error")
+        res.status(500).json({ error: "Internal server error" });
     }
 })
 

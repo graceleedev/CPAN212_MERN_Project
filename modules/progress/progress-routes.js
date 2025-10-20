@@ -19,10 +19,10 @@ progressRoute.get("/:id", async (req, res) => {
     if (progress) {
       res.status(200).json(progress);
     } else {
-      res.status(404).send("progress not found");
+      res.status(404).json({ error: "progress not found" });
     }
   } catch (error) {
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -37,7 +37,7 @@ progressRoute.post("/", saveProgressRules, async (req, res) => {
       res.status(201).json(addedProgress);
     }
   } catch (error) {
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -54,10 +54,10 @@ progressRoute.put("/", saveProgressRules, async (req, res) => {
       const updatedProgress = await updateProgress(req.body);
       res.status(201).json(updatedProgress);
     } else {
-      res.status(404).send("progress not found");
+      res.status(404).json({ error: "progress not found" });
     }
   } catch (error) {
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

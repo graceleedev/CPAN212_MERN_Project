@@ -11,10 +11,10 @@ questionsRoute.get("/:id", async (req, res) => {
     if (question) {
         res.status(200).json(question);
     } else {
-        res.status(404).send("questions not found");
+        res.status(404).json({ error: "questions not found" });
     }
   } catch (error) {
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -28,12 +28,11 @@ questionsRoute.post("/:id/answer", async (req, res) => {
 
     if (question) {
         const result = await checkAnswer(getId, getAnswer);
-    res.status(200).json(result)
+        res.status(200).json(result)
     } else {
-        return res.status(404).send("questions not found");
-    }
+        res.status(404).json({ error: "questions not found" });    }
   } catch (error) {
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

@@ -1,43 +1,43 @@
-const { readFile, writeToFile } = require("../../shared/file-utils")
-const filePath = "./data/users.json"
+const { readFile, writeToFile } = require("../../shared/file-utils");
+const filePath = "./data/users.json";
 
 //read file
 async function getAllUsers() {
-    return readFile(filePath);
+  return readFile(filePath);
 }
 
 //find user by id
 async function getUserById(userId) {
-    if (!userId) throw new Error(`Cannot use ${userId} to get users`);
-    const allUsers = await getAllUsers();
-    const foundUser = allUsers.find((user) => user.id === userId);
-    return foundUser;
+  if (!userId) throw new Error(`Cannot use ${userId} to get users`);
+  const allUsers = await getAllUsers();
+  const foundUser = allUsers.find((user) => user.id === userId);
+  return foundUser;
 }
 
 //find user by email
-async function getUserByEmail(userEmail) {
-    if (!userEmail) throw new Error(`Cannot use ${userEmail} to get users`);
-    const allUsers = await getAllUsers();
-    const foundUser = allUsers.find((user) => user.email === userEmail);
-    return foundUser;
+async function getUserByEmail(userEmail, password) {
+  if (!userEmail || !password) {
+    throw new Error("Email and password are required to find user");
+  }
+  const allUsers = await getAllUsers();
+  const foundUser = allUsers.find((user) => user.email === userEmail && user.password === password);
+  return foundUser;
 }
 
 //create user
 async function addUser(newUser) {
-    if (!newUser) throw new Error(`Cannot use ${userEmail} to get users`);
-    const allUsers = await getAllUsers();
-    newUser = { id: allUsers.length + 1, ...newUser };
-    allUsers.push(newUser);
-    await writeToFile(filePath, allUsers);
-    return newUser;
+  if (!newUser) throw new Error(`Cannot use ${userEmail} to get users`);
+  const allUsers = await getAllUsers();
+  newUser = { id: allUsers.length + 1, ...newUser };
+  allUsers.push(newUser);
+  await writeToFile(filePath, allUsers);
+  return newUser;
 }
 
 //update user
 async function updateUser(userId, updateUser) {
   if (!userId || !updateUser) {
-    throw new Error(
-      `Cannot use ${userId} & ${updateUser} to update user`
-    );
+    throw new Error(`Cannot use ${userId} & ${updateUser} to update user`);
   }
   const allUsers = await getAllUsers();
   const index = allUsers.findIndex((user) => user.id === userId);
@@ -64,10 +64,10 @@ async function deleteUser(userId) {
 }
 
 module.exports = {
-    getAllUsers,
-    getUserById,
-    getUserByEmail,
-    addUser,
-    updateUser,
-    deleteUser
+  getAllUsers,
+  getUserById,
+  getUserByEmail,
+  addUser,
+  updateUser,
+  deleteUser,
 };

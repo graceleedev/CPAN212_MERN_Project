@@ -26,7 +26,7 @@ usersRoute.post("/register", createUserRules, async (req, res) => {
       res.status(201).json(newUser);
     }
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -38,16 +38,17 @@ usersRoute.post("/login", loginUserRules, async (req, res) => {
       res.status(400).json({ errors: errors.array() });
     }
     const getEmail = req.body.email;
-    const loginUser = await getUserByEmail(getEmail);
+    const getPassword = req.body.password;
+    const loginUser = await getUserByEmail(getEmail, getPassword);
     if (loginUser) {
       // Hide password in a response
       const { password, ...safeUser } = loginUser;
       res.status(200).json(safeUser);
     } else {
-      res.status(404).send("user not found");
+      res.status(404).json({ error: "Invalid email or password. Please try again." });
     }
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -61,12 +62,11 @@ usersRoute.put("/setting/update/:id", updateUserRules, async (req, res) => {
     }
     const updatedUser = await updateUser(getId, req.body);
     if (!updatedUser) {
-      res.status(404).send("user not found");
+      res.status(404).json({ error: "user not found" });
     }
     res.status(200).json(updatedUser);
   } catch (error) {
-    
-    res.status(500).send("internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -78,10 +78,10 @@ usersRoute.delete("/setting/delete/:id", async (req, res) => {
       const deletedUser = await deleteUser(getId);
       res.status(200).json(deletedUser);
     } else {
-      res.status(404).send("user not found");
+      res.status(404).json({ error: "user not found" });
     }
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

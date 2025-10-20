@@ -24,12 +24,12 @@ app.get("/", (req, res) => {
 // error-handling middleware
 app.use((error, req, res, next) => {
   console.log(error);
-  res.status(500).send("Oops! Internal server error!");
+  res.status(500).json({ error: "Internal server error!" });
 });
 
 // Middleware handling 404 not found error
 app.use((req, res, next) => {
-  res.status(404).send(`404! ${req.method} ${req.path} Not Found.`);
+  res.status(404).json({ error: `404! ${req.method} ${req.path} Not Found.` });
 });
 
 app.listen(port, () => {
