@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const port = 3000;
 const app = express();
@@ -6,9 +8,13 @@ const { usersRoute } = require("./modules/users/users-routes");
 const { lessonsRoute } = require("./modules/lessons/lessons-routes");
 const { questionsRoute } = require("./modules/questions/questions-routes");
 const { progressRoute } = require("./modules/progress/progress-routes");
+const connectDB = require("./shared/middlewares/connect-db");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//Add the connectDB middleware in application-level
+app.use(connectDB);
 
 //import Routes from each modules
 app.use("/users", usersRoute);
