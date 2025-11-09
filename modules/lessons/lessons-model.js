@@ -1,42 +1,10 @@
-const { readFile } = require("../../shared/file-utils")
-const filePath = "./data/lessons.json"
+const mongoose = require("mongoose");
 
-//read file
-async function getAllLessons() {
-    return readFile(filePath);
-}
+const LessonSchema = new mongoose.Schema({
+  title: {type: String, required: true},
+  level: {type: String, required: true},
+});
 
-//find lesson by id
-async function getLessonById(lessonId) {
-    if (!lessonId) throw new Error(`Cannot use ${lessonId} to get lessons`);
-    const allLessons = await getAllLessons();
-    const foundLesson = allLessons.find((lesson) => lesson.id === lessonId);
-    return foundLesson;
-}
+const LessonModel = mongoose.model("Lesson", LessonSchema);
 
-//search lesson by keyword
-async function searchLesson(keyword) {
-    const allLessons = await getAllLessons();
-    if (!keyword) return allLessons;
-
-    const lowerKeyword = keyword.toLowerCase();
-    const results = allLessons.filter((lesson) => lesson.title.toLowerCase().includes(lowerKeyword));
-    return results;
-}
-
-//filter lesson by level
-async function filterLesson(level) {
-    const allLessons = await getAllLessons();
-    if (!level) return allLessons;
-
-    const lowerKeyword = level.toLowerCase();
-    const results = allLessons.filter((lesson) => lesson.level === level);
-    return results;
-}
-
-module.exports = {
-    getAllLessons,
-    getLessonById,
-    searchLesson,
-    filterLesson
- }
+module.exports = LessonModel;

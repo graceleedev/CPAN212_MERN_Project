@@ -1,57 +1,11 @@
-const { readFile, writeToFile } = require("../../shared/file-utils");
-const filePath = "./data/progress.json";
+const mongoose = require("mongoose");
 
-//read file
-async function getAllProgress() {
-  return readFile(filePath);
-}
+const ProgressSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  lessonId: { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
+  updatedAt: { type: Date, default: Date.now },
+});
 
-//find lesson by id
-async function getProgressByUserId(userId) {
-  if (!userId) throw new Error(`Cannot use ${userId} to get progress`);
-  const allProgress = await getAllProgress();
-  const foundProgress = allProgress.find(
-    (progress) => progress.userId === userId
-  );
-  return foundProgress;
-}
+const ProgressModel = mongoose.model("Progress", ProgressSchema);
 
-//add progress for new users
-async function addProgress(newProgress) {
-  const allProgress = await getAllProgress();
-  const index = allProgress.findIndex(
-    (progress) => Number(progress.userId) === Number(newProgress.userId)
-  );
-  if (index < 0) {
-    allProgress.push({ ...newProgress, updatedAt: new Date().toISOString() });
-  } else {
-    throw new Error(`user progress already exists`)
-  }
-  await writeToFile(filePath, allProgress);
-  return newProgress;
-}
-
-async function updateProgress(newProgress) {
-  const allProgress = await getAllProgress();
-  const index = allProgress.findIndex(
-    (progress) => progress.userId === newProgress.userId
-  );
-  if (index < 0) {
-    throw new Error(`user progress doesn't exist`);
-  } else {
-    allProgress[index] = {
-      ...allProgress[index],
-      ...newProgress,
-      updatedAt: new Date().toISOString(),
-    };
-  }
-  await writeToFile(filePath, allProgress);
-  return newProgress;
-}
-
-module.exports = {
-  getAllProgress,
-  getProgressByUserId,
-  addProgress,
-  updateProgress
-};
+module.exports = ProgressModel;

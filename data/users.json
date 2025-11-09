@@ -1,1 +1,28 @@
-[{"id":1,"name":"Frankieeee","email":"abradden0@cornell.edu","password":"1234","isAdmin":true,"progress":"Progress.lessonId","createdAt":"2025-10-17T14:00:00Z","updatedAt":"2025-10-18T14:00:00Z"},{"id":2,"name":"Husain Swetmore","email":"hswetmore1@t-online.de","password":"4567","isAdmin":false,"progress":"Progress.lessonId","createdAt":"2025-10-17T14:00:00Z","updatedAt":"2025-10-18T14:00:00Z"},{"id":3,"name":"Lisa Main","email":"lisa@cornell.edu","password":"77778888"}]
+[
+  {
+    "id": 1,
+    "name": "Frankieeee",
+    "email": "abradden0@cornell.edu",
+    "password": "1234",
+    "isAdmin": true,
+    "progress": "Progress.lessonId",
+    "createdAt": "2025-10-17T14:00:00Z",
+    "updatedAt": "2025-10-18T14:00:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Husain Swetmore",
+    "email": "hswetmore1@t-online.de",
+    "password": "4567",
+    "isAdmin": false,
+    "progress": "Progress.lessonId",
+    "createdAt": "2025-10-17T14:00:00Z",
+    "updatedAt": "2025-10-18T14:00:00Z"
+  },
+  {
+    "id": 3,
+    "name": "Lisa Main",
+    "email": "lisa@cornell.edu",
+    "password": "77778888"
+  }
+]
