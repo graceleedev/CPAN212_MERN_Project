@@ -11,12 +11,24 @@ const QuestionModel = require("../questions/questions-model.js");
 //example: /lessons/search?keyword=hello
 lessonsRoute.get("/search", async (req, res, next) => {
   try {
-    const getKeyword = req.query.keyword;
+    const { keyword, page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
     const results = await LessonModel.find({
-      title: { $regex: getKeyword, $options: "i" },
+      title: { $regex: keyword, $options: "i" },
+    })
+      .sort({ title: 1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    // Check if there are more results for pagination ("Show more" button)
+    const totalCount = await LessonModel.countDocuments({
+      title: { $regex: keyword, $options: "i" },
     });
-    if (!results) return res.status(200).json([]);
-    res.json(results);
+    const hasMore = page * limit < totalCount;
+
+    if (results.length === 0) return res.status(200).json([]);
+    res.json({ results, hasMore });
   } catch (error) {
     next(error);
   }
@@ -34,7 +46,7 @@ lessonsRoute.get(
       const results = await LessonModel.find({
         level: getLevel.toLowerCase(),
       });
-      if (!results.length) return res.status(200).json([]);
+      if (results.length === 0) return res.status(200).json([]);
       res.json(results);
     } catch (error) {
       next(error);
@@ -47,7 +59,7 @@ lessonsRoute.get(
 lessonsRoute.get("/", async (req, res, next) => {
   try {
     const lessons = await LessonModel.find();
-    if (!lessons.length) return res.status(200).json([]);
+    if (lessons.length === 0) return res.status(200).json([]);
     res.status(200).json(lessons);
   } catch (error) {
     next(error);

@@ -43,6 +43,7 @@ node server.js
   - 400 for validation errors, 404 for missing data, 500 for internal errors
 
 ## Tasks Completed
+### Phase 2
 - Define data structures for all entities: Users, Lessons, Questions, and Progress
 - Create JSON files and prepare sample data
 - Apply modular architecture with separate folders for each module
@@ -57,3 +58,16 @@ node server.js
 - Handle proper HTTP status codes and JSON responses
 - Test all endpoints using Postman
 - Create README.md file
+
+### Phase 3
+- Set up MongoDB connection using Mongoose and .env configuration  
+- Replace JSON-based data logic with MongoDB integration  
+- Create schemas and models for Users, Lessons, Questions, and Progress  
+  - Define field types, constraints, and default values  
+  - Establish references between collections
+- Implement CRUD operations for all modules using Mongoose methods
+- Apply express-validator and custom middleware (checkValidation) for request validation  
+- Add search, filter, sort, and pagination features for lessons
+- Use proper HTTP status codes (201 for creation, 404 for not found, 409 for conflict, etc.)  
+- Implement centralized error-handling middleware with next(error) pattern  
+- Verify MongoDB connection and data creation using MongoDB Compass
