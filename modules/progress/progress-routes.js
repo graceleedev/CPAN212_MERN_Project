@@ -1,64 +1,65 @@
 const express = require("express");
 const progressRoute = express.Router();
 
-const { validationResult } = require("express-validator");
 const { saveProgressRules } = require("./middlewares/save-progress-rules");
+const checkValidation = require("../../shared/middlewares/check-validation.js");
 
-const {
-  getAllProgress,
-  getProgressByUserId,
-  addProgress,
-  updateProgress,
-} = require("./progress-model");
+const ProgressModel = require("./progress-model.js");
 
 //get progress by userId
-progressRoute.get("/:id", async (req, res) => {
+progressRoute.get("/:userId", async (req, res, next) => {
   try {
-    const getId = Number(req.params.id);
-    const progress = await getProgressByUserId(getId);
-    if (progress) {
-      res.status(200).json(progress);
-    } else {
-      res.status(404).json({ error: "progress not found" });
-    }
+    const getId = req.params.userId;
+    const progress = await ProgressModel.findOne({ userId: getId });
+    if (!progress) return res.status(404).json({ error: "progress not found" });
+    res.status(200).json(progress);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 });
 
 //create new progress by userId
-progressRoute.post("/", saveProgressRules, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    } else {
-      const addedProgress = await addProgress(req.body);
-      res.status(201).json(addedProgress);
+progressRoute.post(
+  "/",
+  saveProgressRules,
+  checkValidation,
+  async (req, res, next) => {
+    try {
+      const { userId } = req.body;
+      //check if the user exist
+      const existingProgress = await ProgressModel.findOne({ userId });
+      // Return 409 Conflict if a progress record for this user already exists
+      if (existingProgress)
+        return res
+          .status(409)
+          .json({ error: "Progress for this user already exists" });
+      const progress = await ProgressModel.create(req.body);
+      res.status(201).json(progress);
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 //update new progress by userId
-progressRoute.put("/", saveProgressRules, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+progressRoute.put(
+  "/",
+  saveProgressRules,
+  checkValidation,
+  async (req, res, next) => {
+    try {
+      const { userId } = req.body;
+      const progress = await ProgressModel.findOneAndUpdate(
+        { userId },
+        { $set: req.body },
+        { new: true }
+      );
+      if (!progress) return res.status(404).json({ error: "progress not found" });
+      res.status(200).json(progress);
+    } catch (error) {
+      next(error);
     }
-    const getId = req.body.id;
-    const progress = await getProgressByUserId(getId);
-    if (progress) {
-      const updatedProgress = await updateProgress(req.body);
-      res.status(201).json(updatedProgress);
-    } else {
-      res.status(404).json({ error: "progress not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
-module.exports = { progressRoute };
+module.exports = progressRoute;

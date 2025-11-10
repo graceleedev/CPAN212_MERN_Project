@@ -4,10 +4,10 @@ const express = require("express");
 const port = 3000;
 const app = express();
 
-const { usersRoute } = require("./modules/users/users-routes");
-const { lessonsRoute } = require("./modules/lessons/lessons-routes");
-const { questionsRoute } = require("./modules/questions/questions-routes");
-const { progressRoute } = require("./modules/progress/progress-routes");
+const usersRoute = require("./modules/users/users-routes");
+const lessonsRoute = require("./modules/lessons/lessons-routes");
+const questionsRoute = require("./modules/questions/questions-routes");
+const progressRoute = require("./modules/progress/progress-routes");
 const connectDB = require("./shared/middlewares/connect-db");
 
 app.use(express.json());

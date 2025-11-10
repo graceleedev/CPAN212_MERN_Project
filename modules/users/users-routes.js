@@ -5,84 +5,89 @@ const { createUserRules } = require("./middlewares/create-user-rules.js");
 const { loginUserRules } = require("./middlewares/login-user-rules.js");
 const { updateUserRules } = require("./middlewares/update-user-rules.js");
 const { validationResult } = require("express-validator");
+const checkValidation = require("../../shared/middlewares/check-validation.js");
 
-const {
-  getAllUsers,
-  getUserByEmail,
-  getUserById,
-  addUser,
-  updateUser,
-  deleteUser,
-} = require("./users-model");
+const UserModel = require("./users-model.js");
 
 //User registration page
-usersRoute.post("/register", createUserRules, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    } else {
-      const newUser = await addUser(req.body);
+usersRoute.post(
+  "/register",
+  createUserRules,
+  checkValidation,
+  async (req, res, next) => {
+    try {
+      const newUser = await UserModel.create(req.body);
       res.status(201).json(newUser);
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 //User login page
-usersRoute.post("/login", loginUserRules, async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
+usersRoute.post(
+  "/login",
+  loginUserRules,
+  checkValidation,
+  async (req, res, next) => {
+    try {
+      const getEmail = req.body.email;
+      const getPassword = req.body.password;
+      // Find a user by email and password and hide password in a response
+      const user = await UserModel.findOne({
+        email: getEmail,
+        password: getPassword,
+      }).select("-password");
+
+      if (user) {
+        res.status(200).json(user);
+      } else {
+        res
+          .status(404)
+          .json({ error: "Invalid email or password. Please try again." });
+      }
+    } catch (error) {
+      next(error);
     }
-    const getEmail = req.body.email;
-    const getPassword = req.body.password;
-    const loginUser = await getUserByEmail(getEmail, getPassword);
-    if (loginUser) {
-      // Hide password in a response
-      const { password, ...safeUser } = loginUser;
-      res.status(200).json(safeUser);
-    } else {
-      res.status(404).json({ error: "Invalid email or password. Please try again." });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 //User setting page
-usersRoute.put("/setting/update/:id", updateUserRules, async (req, res) => {
+//update an existing user
+usersRoute.put(
+  "/setting/update/:id",
+  updateUserRules,
+  validationResult,
+  async (req, res, next) => {
+    try {
+      const getId = req.params.id;
+      const user = await UserModel.findByIdAndUpdate(
+        getId,
+        { $set: req.body },
+        { new: true }
+      );
+      if (!user) {
+        return res.status(404).json({ error: "user not found" });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+//delete a user
+usersRoute.delete("/setting/delete/:id", async (req, res, next) => {
   try {
-    const getId = Number(req.params.id);
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const getId = req.params.id;
+    const user = await UserModel.findByIdAndDelete(getId);
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
     }
-    const updatedUser = await updateUser(getId, req.body);
-    if (!updatedUser) {
-      res.status(404).json({ error: "user not found" });
-    }
-    res.status(200).json(updatedUser);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 });
 
-usersRoute.delete("/setting/delete/:id", async (req, res) => {
-  try {
-    const getId = Number(req.params.id);
-    const user = await getUserById(getId);
-    if (user) {
-      const deletedUser = await deleteUser(getId);
-      res.status(200).json(deletedUser);
-    } else {
-      res.status(404).json({ error: "user not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-module.exports = { usersRoute };
+module.exports = usersRoute;

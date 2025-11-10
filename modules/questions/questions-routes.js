@@ -1,39 +1,34 @@
 const express = require("express");
 const questionsRoute = express.Router();
 
-const { getQuestionById, checkAnswer } = require("./questions-model");
+const QuestionModel = require("./questions-model");
 
 //get questions by questionId
-questionsRoute.get("/:id", async (req, res) => {
+questionsRoute.get("/:id", async (req, res, next) => {
   try {
-    const getId = Number(req.params.id);
-    const question = await getQuestionById(getId);
-    if (question) {
-        res.status(200).json(question);
-    } else {
-        res.status(404).json({ error: "questions not found" });
-    }
+    const getId = req.params.id;
+    const question = await QuestionModel.findById(getId);
+    if (!question) return res.status(404).json({ error: "question not found" });
+    res.status(200).json(question);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 });
 
 //check answers
 //id, answer
-questionsRoute.post("/:id/answer", async (req, res) => {
+questionsRoute.post("/:id/answer", async (req, res, next) => {
   try {
-    const getId = Number(req.params.id);
+    const getId = req.params.id;
     const getAnswer = req.body.answer;
-    const question = await getQuestionById(getId);
-
-    if (question) {
-        const result = await checkAnswer(getId, getAnswer);
-        res.status(200).json(result)
-    } else {
-        res.status(404).json({ error: "questions not found" });    }
+    const question = await QuestionModel.findById(getId);
+    if (!question) return res.status(404).json({ error: "question not found" });
+    const isCorrect = question.correctAnswer === getAnswer;
+    const feedback = isCorrect ? "Correct!" : "Try again";
+    res.status(200).json(feedback);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 });
 
-module.exports = { questionsRoute };
+module.exports = questionsRoute;
