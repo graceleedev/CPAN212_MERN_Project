@@ -8,6 +8,7 @@ questionsRoute.get("/:id", async (req, res, next) => {
   try {
     const getId = req.params.id;
     const question = await QuestionModel.findById(getId);
+
     if (!question) return res.status(404).json({ error: "question not found" });
     res.status(200).json(question);
   } catch (error) {
@@ -21,8 +22,12 @@ questionsRoute.post("/:id/answer", async (req, res, next) => {
   try {
     const getId = req.params.id;
     const getAnswer = req.body.answer;
+    if (!getAnswer || getAnswer.trim() === "")
+      return res.status(400).json({ error: "Answer is required" });
+
     const question = await QuestionModel.findById(getId);
     if (!question) return res.status(404).json({ error: "question not found" });
+
     const isCorrect = question.correctAnswer === getAnswer;
     const feedback = isCorrect ? "Correct!" : "Try again";
     res.status(200).json(feedback);

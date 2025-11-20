@@ -28,11 +28,13 @@ progressRoute.post(
       const { userId } = req.body;
       //check if the user exist
       const existingProgress = await ProgressModel.findOne({ userId });
+
       // Return 409 Conflict if a progress record for this user already exists
       if (existingProgress)
         return res
           .status(409)
           .json({ error: "Progress for this user already exists" });
+
       const progress = await ProgressModel.create(req.body);
       res.status(201).json(progress);
     } catch (error) {
@@ -54,7 +56,9 @@ progressRoute.put(
         { $set: req.body },
         { new: true }
       );
-      if (!progress) return res.status(404).json({ error: "progress not found" });
+
+      if (!progress)
+        return res.status(404).json({ error: "progress not found" });
       res.status(200).json(progress);
     } catch (error) {
       next(error);

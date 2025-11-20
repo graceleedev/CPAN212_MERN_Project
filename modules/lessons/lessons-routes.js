@@ -71,6 +71,7 @@ lessonsRoute.get("/:id", async (req, res, next) => {
   try {
     const getId = req.params.id;
     const lesson = await LessonModel.findById(getId);
+
     if (!lesson) return res.status(404).json({ error: "lesson not found" });
     res.status(200).json(lesson);
   } catch (error) {
@@ -83,6 +84,7 @@ lessonsRoute.get("/:id/questions", async (req, res, next) => {
   try {
     const getId = req.params.id;
     const questions = await QuestionModel.find({ lessonId: getId });
+
     if (!questions)
       return res.status(404).json({ error: "No questions found" });
     res.status(200).json(questions);

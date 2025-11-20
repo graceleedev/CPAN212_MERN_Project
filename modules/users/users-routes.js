@@ -4,7 +4,6 @@ const usersRoute = express.Router();
 const { createUserRules } = require("./middlewares/create-user-rules.js");
 const { loginUserRules } = require("./middlewares/login-user-rules.js");
 const { updateUserRules } = require("./middlewares/update-user-rules.js");
-const { validationResult } = require("express-validator");
 const checkValidation = require("../../shared/middlewares/check-validation.js");
 
 const UserModel = require("./users-model.js");
@@ -33,6 +32,7 @@ usersRoute.post(
     try {
       const getEmail = req.body.email;
       const getPassword = req.body.password;
+
       // Find a user by email and password and hide password in a response
       const user = await UserModel.findOne({
         email: getEmail,
@@ -57,7 +57,7 @@ usersRoute.post(
 usersRoute.put(
   "/setting/update/:id",
   updateUserRules,
-  validationResult,
+  checkValidation,
   async (req, res, next) => {
     try {
       const getId = req.params.id;
