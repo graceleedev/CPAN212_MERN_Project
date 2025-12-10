@@ -5,6 +5,10 @@ const { createUserRules } = require("./middlewares/create-user-rules.js");
 const { loginUserRules } = require("./middlewares/login-user-rules.js");
 const { updateUserRules } = require("./middlewares/update-user-rules.js");
 const checkValidation = require("../../shared/middlewares/check-validation.js");
+const authorize = require("../../shared/middlewares/authorize")
+const {encodeToken} = require("../../shared/jwt-utils") 
+const {matchPassword} = require("../../shared/password-utils")
+
 
 const UserModel = require("./users-model.js");
 
@@ -16,7 +20,8 @@ usersRoute.post(
   async (req, res, next) => {
     try {
       const newUser = await UserModel.create(req.body);
-      res.status(201).json(newUser);
+      const { password, ...safeUser } = newUser.toObject();
+      res.status(201).json(safeUser);
     } catch (error) {
       next(error);
     }
@@ -30,22 +35,25 @@ usersRoute.post(
   checkValidation,
   async (req, res, next) => {
     try {
-      const getEmail = req.body.email;
-      const getPassword = req.body.password;
+      const { email, password } = req.body;
 
-      // Find a user by email and password and hide password in a response
-      const user = await UserModel.findOne({
-        email: getEmail,
-        password: getPassword,
-      }).select("-password");
-
-      if (user) {
-        res.status(200).json(user);
-      } else {
-        res
-          .status(404)
-          .json({ error: "Invalid email or password. Please try again." });
+      // Find a user by email and password
+      const foundUser = await UserModel.findOne({
+        email: email
+      });
+      if (!foundUser) {
+        res.status(404).json({ error: `User with ${email} doesn't exist` });
       }
+
+      const passwordMatched = matchPassword(password, foundUser.password);
+      if (!passwordMatched) {
+        return res.status(401).send({
+          errorMessage: "Invalid password",
+        });
+      }
+      const user = { ...foundUser.toJSON(), password: undefined };
+      const token = encodeToken(user);
+      res.json({ user, token });
     } catch (error) {
       next(error);
     }
