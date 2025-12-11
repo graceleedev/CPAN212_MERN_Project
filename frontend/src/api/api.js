@@ -88,3 +88,66 @@ export async function fetchLessons() {
     ...data,
   };
 }
+
+export async function searchLessons(keyword, page = 1, limit = 10) {
+  const params = new URLSearchParams({
+    keyword,
+    page: String(page),
+    limit: String(limit),
+  });
+
+  const response = await fetch(`${BASE_URL}/lessons/search?${params}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+  });
+
+  const data = await response.json();
+  return { status: response.status, ...data };
+}
+
+
+// Fetch a single user profile by id
+export async function fetchUserProfile(userId) {
+  const response = await fetch(`${BASE_URL}/users/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+  });
+
+  const data = await response.json();
+  return { status: response.status, ...data };
+}
+
+// Update a user profile (settings page)
+export async function updateUserProfile(userId, payload) {
+  const response = await fetch(`${BASE_URL}/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  return { status: response.status, ...data };
+};
+
+//delete user
+export async function deleteUser(userId) {
+  const response = await fetch(`${BASE_URL}/users/${userId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    }
+  });
+
+  const data = await response.json();
+  return { status: response.status, ...data };
+}
