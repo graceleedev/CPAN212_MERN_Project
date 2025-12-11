@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
-const port = 3000;
+const port = process.env.PORT || 3000;
 const hostname = "0.0.0.0";
 const app = express();
 const cors = require("cors");
@@ -14,7 +14,10 @@ const connectDB = require("./shared/middlewares/connect-db");
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://cpan-212-mern-project.vercel.app"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })

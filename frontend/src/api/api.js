@@ -12,6 +12,8 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 //   return data;
 // }
 
+console.log(BASE_URL);
+
 // User registration request
 export async function registerUser(payload) {
   const response = await fetch(`${BASE_URL}/users/register`, {
