@@ -99,7 +99,7 @@ usersRoute.post(
 //OTP verification page
 usersRoute.post("/verify-login", verifyLoginRules, async (req, res) => {
   const { email, otp } = req.body;
-  const savedOTP = await OTPModel.findOne({ email: email });
+  const savedOTP = await OTPModel.findOne({ account: foundUser._id, otp });
   if (!savedOTP || Number(otp) != Number(savedOTP.otp)) {
     return res.status(403).send({ errorMessage: "OTP is not valid!" });
   }
