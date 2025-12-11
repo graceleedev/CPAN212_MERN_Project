@@ -64,15 +64,14 @@ usersRoute.post(
       const user = { ...foundUser.toJSON(), password: undefined };
       // res.json({ user });
       const OTP = randomNumberOfNDigits(6);
-      const newOTP = {
-        email: email,
-        otp: OTP,
-      };
       const addedOTP = await OTPModel.updateOne(
         {
-          email: email,
+          account: user._id,
         },
-        newOTP,
+        {
+          account: user._id,
+          otp: OTP
+        },
         { upsert: true }
       );
 
