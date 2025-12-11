@@ -118,6 +118,33 @@ usersRoute.post("/verify-login", verifyLoginRules, async (req, res) => {
   res.json({ user, token });
 });
 
+//get user info
+usersRoute.get(
+  "/:id",
+  checkValidation,
+  authorize(),
+  async (req, res, next) => {
+    try {
+      const getId = req.params.id;
+      const isAdmin = req.account.roles.includes("admin");
+      const isOwner = getId == req.account.id;
+      const foundUser = await UserModel.findById(
+        getId
+      ).select("-password");
+      //check if user is admin or the owner of the user account
+      if (!isAdmin && !isOwner) {
+        return res.status(403).send({ errorMessage: "Access denied" });
+      }
+      if (!foundUser) {
+        return res.status(404).json({ error: "user not found" });
+      }
+      res.status(200).json(foundUser);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 //User setting page
 //update an existing user
 //only allow the owner of the account or admin to update an user

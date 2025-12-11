@@ -2,13 +2,23 @@ require("dotenv").config();
 
 const express = require("express");
 const port = 3000;
+const hostname = "0.0.0.0";
 const app = express();
+const cors = require("cors");
 
 const usersRoute = require("./modules/users/users-routes");
 const lessonsRoute = require("./modules/lessons/lessons-routes");
 const questionsRoute = require("./modules/questions/questions-routes");
 const progressRoute = require("./modules/progress/progress-routes");
 const connectDB = require("./shared/middlewares/connect-db");
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,8 +34,8 @@ app.use("/progress", progressRoute);
 
 //main page
 app.get("/", (req, res) => {
-    res.send("Welcome to Ringo🍎");
-})
+  res.send("Welcome to Ringo🍎");
+});
 
 // error-handling middleware
 app.use((error, req, res, next) => {
@@ -39,5 +49,5 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
+  console.log(`Server running at http://${hostname}:${port}/`);
 });
