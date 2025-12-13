@@ -7,60 +7,39 @@ const checkValidation = require("../../shared/middlewares/check-validation.js");
 const LessonModel = require("./lessons-model");
 const QuestionModel = require("../questions/questions-model.js");
 
-//search lessons
-//example: /lessons/search?keyword=hello
-lessonsRoute.get("/search", async (req, res, next) => {
-  try {
-    const { keyword, page = 1, limit = 10 } = req.query;
-    const skip = (page - 1) * limit;
-
-    const results = await LessonModel.find({
-      title: { $regex: keyword, $options: "i" },
-    })
-      .sort({ title: 1 })
-      .skip(skip)
-      .limit(Number(limit));
-
-    // Check if there are more results for pagination ("Show more" button)
-    const totalCount = await LessonModel.countDocuments({
-      title: { $regex: keyword, $options: "i" },
-    });
-    const hasMore = page * limit < totalCount;
-
-    if (results.length === 0) return res.status(200).json([]);
-    res.json({ results, hasMore });
-  } catch (error) {
-    next(error);
-  }
-});
-
-//filter lessons by level
-//example: /lessons/filter?level=beginner
-lessonsRoute.get(
-  "/filter",
-  filterLessonRules,
-  checkValidation,
-  async (req, res, next) => {
-    try {
-      const getLevel = req.query.level;
-      const results = await LessonModel.find({
-        level: getLevel.toLowerCase(),
-      });
-      if (results.length === 0) return res.status(200).json([]);
-      res.json(results);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
 //lesson main page
 //get all lessons
+//search and filter lessons if user entered input
+
+//url example: /lessons/?keyword=hello
+// /lessons?level=beginner
+// /lessons?keyword=hello&level=beginner&page=1&limit=10
 lessonsRoute.get("/", async (req, res, next) => {
   try {
-    const lessons = await LessonModel.find();
-    if (lessons.length === 0) return res.status(200).json([]);
-    res.status(200).json(lessons);
+    const { keyword, level, page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+
+    if (keyword && keyword.trim()) {
+      filter.title = { $regex: keyword, $options: "i" };
+    }
+    if (level && level.trim()) {
+      filter.level = level.trim().toLowerCase();
+    }
+
+    const [results, totalCount] = await Promise.all([
+      LessonModel.find(filter)
+      .sort({ title: 1 })
+      .skip(skip)
+      .limit(Number(limit)),
+      LessonModel.countDocuments(filter),
+    ])
+
+    // Check if there are more results for pagination ("Show more" button)
+    const hasMore = page * limit < totalCount;
+
+    return res.status(200).json({ results, totalCount, hasMore });
   } catch (error) {
     next(error);
   }
