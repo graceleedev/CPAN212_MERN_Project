@@ -74,8 +74,6 @@ usersRoute.post(
         },
         { upsert: true }
       );
-
-      console.log("[LOGIN] Generated OTP:", OTP, "for", email);
       if (!addedOTP) {
         return res.status(500).send({
           errorMessage: "We couldn’t generate an OTP. Please try again.",
