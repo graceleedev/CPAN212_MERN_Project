@@ -96,8 +96,8 @@ function OtpVerify() {
       <h1>OTP Verification</h1>
 
       {/* Info message */}
-      <p style={{ color: "green", marginBottom: "8px" }}>
-        We’ve sent a verification code to your email address.
+      <p style={{ color: "white", marginBottom: "8px" }}>
+        We’ve sent a verification code to your email address!
       </p>
 
       {email && (

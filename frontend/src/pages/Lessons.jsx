@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { fetchLessons } from "../api/api";
 
 function Lessons() {
@@ -133,7 +133,7 @@ function Lessons() {
                   setPage(1);
                   setLevel(e.target.value);
                 }}
-                style={{ display: "block", width: "100%", padding: "8px" }}
+                style={{ display: "block", width: "100%", padding: "8px", borderRadius: "8px", backgroundColor: "transparent" }}
               >
                 <option value="">All</option>
                 <option value="beginner">Beginner</option>
@@ -191,6 +191,9 @@ function Lessons() {
               Show more
             </button>
           )}
+
+          {/* Link to setting page */}
+          <Link to="/settings">Go to Settings</Link>
         </>
       )}
     </div>

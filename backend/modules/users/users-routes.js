@@ -169,19 +169,33 @@ usersRoute.put(
   }
 );
 
-//delete a user
-//only allow admin to delete user accounts
-usersRoute.delete("/:id", authorize(["admin"]), async (req, res, next) => {
-  try {
-    const getId = req.params.id;
-    const user = await UserModel.findByIdAndDelete(getId);
-    if (!user) {
-      return res.status(404).json({ error: "user not found" });
+// delete a user
+// allow admin OR the owner of the account to delete
+usersRoute.delete(
+  "/:id",
+  checkValidation,
+  authorize(),
+  async (req, res, next) => {
+    try {
+      const getId = req.params.id;
+
+      const isAdmin = req.account.roles.includes("admin");
+      const isOwner = String(getId) === String(req.account.id);
+
+      if (!isAdmin && !isOwner) {
+        return res.status(403).send({ errorMessage: "Access denied" });
+      }
+
+      const user = await UserModel.findByIdAndDelete(getId).select("-password");
+      if (!user) {
+        return res.status(404).json({ error: "user not found" });
+      }
+
+      res.status(200).json(user);
+    } catch (error) {
+      next(error);
     }
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 module.exports = usersRoute;

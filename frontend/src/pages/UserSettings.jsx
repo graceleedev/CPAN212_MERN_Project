@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  fetchUserProfile,
-  updateUserProfile,
-  deleteUser,
-} from "../api/api";
+import { fetchUserProfile, updateUserProfile, deleteUser } from "../api/api";
+
+import LogoutButton from "../components/LogoutButton";
 
 const EMPTY_FORM = {
   name: "",
@@ -122,8 +120,6 @@ function UserSettings() {
 
         const updatedUser = {
           ...parsedUser,
-          // If email can change, update it here:
-          // email: result.email || form.email,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
       } else if (result.status === 404) {
@@ -137,8 +133,7 @@ function UserSettings() {
         );
       } else {
         setGeneralError(
-          result.errorMessage ||
-            "Failed to update profile. Please try again."
+          result.errorMessage || "Failed to update profile. Please try again."
         );
       }
     } catch (error) {
@@ -176,6 +171,7 @@ function UserSettings() {
       if (result.status === 200) {
         // Account deleted successfully: clear auth info and redirect to login
         localStorage.removeItem("token");
+        localStorage.removeItem("pendingEmail");
         localStorage.removeItem("user");
         setSuccessMessage("Your account has been deleted.");
 
@@ -191,8 +187,7 @@ function UserSettings() {
         setGeneralError("User not found. Please try logging in again.");
       } else {
         setGeneralError(
-          result.errorMessage ||
-            "Failed to delete account. Please try again."
+          result.errorMessage || "Failed to delete account. Please try again."
         );
       }
     } catch (error) {
@@ -222,9 +217,7 @@ function UserSettings() {
       )}
 
       {successMessage && (
-        <p style={{ color: "green", marginBottom: "12px" }}>
-          {successMessage}
-        </p>
+        <p style={{ color: "green", marginBottom: "12px" }}>{successMessage}</p>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -265,6 +258,9 @@ function UserSettings() {
       </form>
 
       <hr style={{ margin: "24px 0" }} />
+      <div>
+        <LogoutButton>Sign out</LogoutButton>
+      </div>
 
       <div>
         <p style={{ fontSize: "0.9rem", color: "#555" }}>

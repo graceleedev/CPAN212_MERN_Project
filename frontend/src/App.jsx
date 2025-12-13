@@ -4,6 +4,7 @@ import VerifyLogin from "./pages/VerifyLogin.jsx";
 import Register from "./pages/Register.jsx";
 import Lessons from "./pages/Lessons.jsx";
 import UserSettings from "./pages/UserSettings.jsx";
+import "./index.css";
 
 function App() {
   return (

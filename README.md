@@ -71,3 +71,17 @@ node server.js
 - Use proper HTTP status codes (201 for creation, 404 for not found, 409 for conflict, etc.)  
 - Implement centralized error-handling middleware with next(error) pattern  
 - Verify MongoDB connection and data creation using MongoDB Compass
+
+### Phase 4
+- Set up the React frontend with Vite in the /frontend folder
+- Created an API using fetch for frontend-backend integration
+- Built core UI pages: Register, Login, OTP Verify, Lessons list, User Settings
+- Integrated lessons features in the UI including list display and search/filter via API calls
+- Implemented token storage and attached JWT to protected API calls from the frontend
+
+### Phase 5
+- Implemented email OTP login flow with OTP generation, storage, and verification
+- Issued JWT after successful OTP verification and protected routes using token validation
+- Added role-based authorization middleware to restrict access for account owner(user) and admin
+- Deployed and tested authentication flow in production and adjusted CORS settings for frontend-backend access
+- Integrated Google API for sending OTP emails
