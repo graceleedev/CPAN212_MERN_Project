@@ -30,11 +30,11 @@ lessonsRoute.get("/", async (req, res, next) => {
 
     const [results, totalCount] = await Promise.all([
       LessonModel.find(filter)
-      .sort({ title: 1 })
-      .skip(skip)
-      .limit(Number(limit)),
+        .sort({ title: 1 })
+        .skip(skip)
+        .limit(Number(limit)),
       LessonModel.countDocuments(filter),
-    ])
+    ]);
 
     // Check if there are more results for pagination ("Show more" button)
     const hasMore = page * limit < totalCount;

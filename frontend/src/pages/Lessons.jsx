@@ -1,121 +1,48 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchLessons, searchLessons } from "../api/api";
+import { fetchLessons } from "../api/api";
 
 function Lessons() {
   const [lessons, setLessons] = useState([]);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [level, setLevel] = useState("");
+
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(false); 
+
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    let redirectTimer;
-
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setGeneralError("Login is required to view lessons. Redirecting...");
-      setLoading(false);
-
-      redirectTimer = setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } else {
-      // Token exists: load initial lessons from the protected API
-      const loadLessons = async () => {
-        try {
-          const result = await fetchLessons();
-
-          if (result.status === 200) {
-            // Backend may return either an array or an object with a lessons property
-            const list = Array.isArray(result) ? result : result.lessons;
-            setLessons(list || []);
-            setHasMore(false);
-            setGeneralError("");
-          } else {
-            setGeneralError(
-              result.errorMessage ||
-                "Failed to load lessons. Please try again."
-            );
-          }
-        } catch (error) {
-          console.error(error);
-          setGeneralError("Network error. Please try again.");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      loadLessons();
-    }
-
-    // Clean up redirect timer if the component unmounts
-    return () => {
-      if (redirectTimer) {
-        clearTimeout(redirectTimer);
-      }
-    };
-  }, [navigate]);
-
-  // Handle search form submission (calls /lessons/search on the backend)
-  const handleSearchSubmit = async (e) => {
-    e.preventDefault();
-
-    // If the search box is empty, reload the full lessons list
-    if (!search.trim()) {
-      setLoading(true);
-      setGeneralError("");
-
-      try {
-        const result = await fetchLessons();
-
-        if (result.status === 200) {
-          const list = Array.isArray(result) ? result : result.lessons;
-          setLessons(list || []);
-          setHasMore(false);
-        } else {
-          setGeneralError(
-            result.errorMessage ||
-              "Failed to load lessons. Please try again."
-          );
-        }
-      } catch (error) {
-        console.error(error);
-        setGeneralError("Network error. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
-    // Non-empty keyword: call /lessons/search with the keyword
+  const loadLessons = async ({ keyword, level, page }) => {
     setLoading(true);
     setGeneralError("");
 
     try {
-      const keyword = search.trim();
-      const result = await searchLessons(keyword, 1, 10);
+      const result = await fetchLessons({ keyword, level, page, limit });
 
       if (result.status === 200) {
-        // Backend can return either [] or { results, hasMore }
-        let list = [];
-        let more = false;
+        const list = Array.isArray(result.results) ? result.results : [];
+        const more = !!result.hasMore;
+        const count = Number.isFinite(result.totalCount)
+          ? result.totalCount
+          : 0;
 
-        if (Array.isArray(result)) {
-          list = result;
-        } else if (Array.isArray(result.results)) {
-          list = result.results;
-          more = !!result.hasMore;
+        if (page === 1) {
+          setLessons(list);
+        } else {
+          setLessons((prev) => [...prev, ...list]);
         }
 
-        setLessons(list);
         setHasMore(more);
+        setTotalCount(count);
       } else {
         setGeneralError(
-          result.errorMessage || "Search failed. Please try again."
+          result.errorMessage || "Failed to load lessons. Please try again."
         );
       }
     } catch (error) {
@@ -123,6 +50,51 @@ function Lessons() {
       setGeneralError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let redirectTimer;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setGeneralError("Login is required to view lessons. Redirecting...");
+      setLoading(false);
+
+      redirectTimer = setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+      return () => redirectTimer && clearTimeout(redirectTimer);
+    }
+
+    loadLessons({ keyword, level, page });
+
+    return () => redirectTimer && clearTimeout(redirectTimer);
+  }, [navigate, keyword, level, page]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setPage(1);
+    setKeyword(searchInput.trim()); // Empty keyword means "load all"
+  };
+
+  /**
+   * Clears search + level and reloads page 1.
+   */
+  const handleClear = () => {
+    setSearchInput("");
+    setKeyword("");
+    setLevel("");
+    setPage(1);
+  };
+
+  /**
+   * Loads the next page if available.
+   */
+  const handleShowMore = () => {
+    if (hasMore && !loading) {
+      setPage((p) => p + 1);
     }
   };
 
@@ -137,26 +109,55 @@ function Lessons() {
         <p style={{ color: "red", marginBottom: "12px" }}>{generalError}</p>
       )}
 
-      {!loading && !generalError && (
+      {!generalError && (
         <>
-          {/* Search form */}
+          {/* Search + filter form (optional) */}
           <form onSubmit={handleSearchSubmit} style={{ marginBottom: "16px" }}>
             <label>
               Search
               <input
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by title"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search by title (optional)"
                 style={{ display: "block", width: "100%", padding: "8px" }}
               />
             </label>
-            <button type="submit" style={{ marginTop: "8px" }}>
-              Search
-            </button>
+
+            <label style={{ display: "block", marginTop: "12px" }}>
+              Level
+              <select
+                value={level}
+                onChange={(e) => {
+                  // Reset pagination when filters change
+                  setPage(1);
+                  setLevel(e.target.value);
+                }}
+                style={{ display: "block", width: "100%", padding: "8px" }}
+              >
+                <option value="">All</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </label>
+
+            <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
+              <button type="submit" disabled={loading}>
+                Search
+              </button>
+              <button type="button" onClick={handleClear} disabled={loading}>
+                Clear
+              </button>
+            </div>
           </form>
 
-          {lessons.length === 0 ? (
+          {/* Optional metadata */}
+          <p style={{ fontSize: "0.9rem", marginBottom: "12px" }}>
+            Showing {lessons.length} of {totalCount} lessons
+          </p>
+
+          {lessons.length === 0 && !loading ? (
             <p>No lessons found.</p>
           ) : (
             <ul style={{ listStyle: "none", paddingLeft: 0 }}>
@@ -184,12 +185,11 @@ function Lessons() {
             </ul>
           )}
 
-          {/* Optional: information about more results (for future pagination) */}
+          {/* "Show more" pagination button */}
           {hasMore && (
-            <p style={{ marginTop: "8px", fontSize: "0.9rem" }}>
-              There are more results available. You can add pagination or a
-              "Show more" button later if needed.
-            </p>
+            <button onClick={handleShowMore} disabled={loading}>
+              Show more
+            </button>
           )}
         </>
       )}

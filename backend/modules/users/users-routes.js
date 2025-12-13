@@ -70,7 +70,7 @@ usersRoute.post(
         },
         {
           account: user._id,
-          otp: OTP
+          otp: OTP,
         },
         { upsert: true }
       );

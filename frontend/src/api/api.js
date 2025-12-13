@@ -73,42 +73,30 @@ export async function verifyOtp(payload) {
 }
 
 // Fetch lessons list
-export async function fetchLessons() {
-  const response = await fetch(`${BASE_URL}/lessons`, {
-    method: "GET",
+export async function fetchLessons({
+  keyword = "",
+  level = "",
+  page = 1,
+  limit = 10,
+} = {}) {
+  const token = localStorage.getItem("token");
+
+  const params = new URLSearchParams();
+  if (keyword) params.set("keyword", keyword);
+  if (level) params.set("level", level);
+  params.set("page", String(page));
+  params.set("limit", String(limit));
+
+  const response = await fetch(`${BASE_URL}/lessons?${params.toString()}`, {
     headers: {
       "Content-Type": "application/json",
-      ...getAuthHeaders(),
-    },
-  });
-  const data = await response.json();
-
-  return {
-    status: response.status,
-    ...data,
-  };
-}
-
-export async function searchLessons(keyword, page = 1, limit = 10) {
-  const params = new URLSearchParams({
-    keyword,
-    page: String(page),
-    limit: String(limit),
-  });
-
-  const response = await fetch(`${BASE_URL}/lessons/search?${params}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...getAuthHeaders(),
+      Authorization: `Bearer ${token}`,
     },
   });
 
   const data = await response.json();
   return { status: response.status, ...data };
 }
-
-
 // Fetch a single user profile by id
 export async function fetchUserProfile(userId) {
   const response = await fetch(`${BASE_URL}/users/${userId}`, {
@@ -136,7 +124,7 @@ export async function updateUserProfile(userId, payload) {
 
   const data = await response.json();
   return { status: response.status, ...data };
-};
+}
 
 //delete user
 export async function deleteUser(userId) {
@@ -145,7 +133,7 @@ export async function deleteUser(userId) {
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeaders(),
-    }
+    },
   });
 
   const data = await response.json();
